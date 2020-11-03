@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name=”viewport” content=”width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no”>
+    <title>VueDocument</title>
+    <style>
+        body{
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        li{
+            list-style: none;
+        }
+        #app{
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        header{
+            position: relative;
+            height: 8rem;
+            background-color: rgba(104, 109, 224,1.0);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header>span,header>input{
+            display: inline-block;
+            height: 4rem;
+            flex: 1;
+            line-height: 4rem;
+            font-size: 3rem;
+        }
+        header>span{
+            text-align: center;
+            font-weight: 700;
+            text-transform: capitalize;
+            color: #fff;
+            transition: 5s;
+        }
+        header>span:nth-of-type(2){
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            padding-left: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+        }
+        header:hover span:first-of-type{
+            opacity: 0;
+        }
+        header:hover span:nth-of-type(2){
+            opacity: 1;
+        }
+        header>input{
+            margin-right: 1rem;
+            padding-left: 10px;
+            outline-style: none;
+            font-size: 1.5rem;
+            border-radius: 5px;
+        }
+        main{
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            background-color: #fff;
+            overflow: scroll;
+            /* align-items: center; */
+        }
+        main>article{
+            width: 95%;
+            /* background-color: rgba(199, 236, 238,.5); */
+        }
+        .allSelect{
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+        }
+        .allSelect>span{
+            width: 85%;
+            background-color: transparent;
+            border-left: 5px solid transparent;
+            margin-top: 12px;
+            display: flex;
+            color: #000;
+            font-size: 30px;
+            padding: 10px;
+        }
+        .allSelect input{
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        .allSelect button{
+            width: 8rem;
+            height: 100%;
+            font-size: 30px;
+            background-color: transparent;
+            outline-style: none;
+            border: none;
+            border-radius: 5px;
+           
+        }
+        button:hover{
+            background-color: #dcdde1;
+            color: #fff;
+        }
+        button:active{
+            background-color: #00a8ff;
+            /* color: #44bd32; */
+        }
+        .allSelect>span:first-of-type{
+            width: 20%;
+        }
+        .allSelect>span:nth-of-type(2){
+            flex: 1;
+        }
+        .showList>div:first-child{
+            display: flex;
+            justify-content: space-evenly;
+        }
+        div>h1{
+            flex: 1;
+            height: 3vh;
+            font-size: 2em;
+        }
+        ul{
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            margin: 0;
+            padding: 0;
+        }
+        article .showList:first-child li{
+            /* height: 3vh; */
+            width: 85%;
+            background-color: #ff9f43;
+            opacity: .8;
+            border-left: 5px solid #eb4d4b;
+            margin-top: 12px;
+            display: flex;
+            color: #fff;
+            font-size: 30px;
+            padding: 10px;
+        }
+        .showList:first-child li>span:nth-of-type(2){
+            width: 18vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ee5253;
+            cursor: pointer;
+            box-shadow: 0,10px,10px,rgba(0,0,0,.8);
+        }
+        .showList:first-child li>span:nth-of-type(2):hover{
+            background-color:#44bd32;
+        }
+        li>span:first-of-type{
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        li input{
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        span>label{
+            flex: 1;
+        }
+        .doneList>li{
+            width: 85%;
+            background-color: #f5f6fa;
+            opacity: .6;
+            border-left: 5px solid #271010;
+            margin-top: 12px;
+            display: flex;
+            color: rgb(22, 19, 19);
+            font-size: 30px;
+            padding: 10px;
+        }
+        .doneList>li>span{
+            float: 1;
+        }
+        .doneList>li>span:nth-of-type(2){
+            display: flex;
+            align-items: center;
+            color: #576574;
+            font-size: 20px;
+        }
+        .fade-enter,.fade-leave-to{
+            opacity: 0;
+            transform: translateX(100vh);
+        }
+        .fade-enter-active,.fade-leave-active{
+            transition: all 1s;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <div id="app">
+        <header>
+            <span>todolist</span>
+            <span @click.stop.once='getLocalCache'>Cache</span>
+            <input type="text" placeholder="请输入待办事项" v-model='userInput' @keydown.enter='todoSub'>
+        </header>
+        <main>
+            <article>
+                <div class="showList">
+                    <div>
+                        <h1>正在处理中</h1>
+                        <h1>{{doingList.length}}</h1>
+                    </div>
+                    <div class="allSelect">
+                        <span>
+                            <label for="all-select">
+                                <input type="checkbox" name="" id="all-select" :checked='userCheck' @click.stop='allCheck' :disabled='doingList.length === 0'>
+                                全选
+                            </label>
+                        </span>
+                        <span>
+                            <button @click.stop='deleteSelected'>删除</button>
+                        </span>
+                    </div>
+                    <hr>
+                    <!-- <ul> -->
+                    <transition-group name='fade' tag='ul'>
+                        <li v-for='item,index in doingList' :key='item+index'>
+                            <span>
+                                <label :for="item.thing"><input type="checkbox" name="" :id="item.thing" :checked='item.isCheck' @click.stop='itemCheck(index)'>
+                                    {{item.thing}}
+                                </label>
+                            </span>
+                            <span @click.stop='selectDone(index)'>完成</span>
+                        </li>
+                    </transition-group>
+                    <!-- </ul> -->
+                </div>
+                <div class="showList">
+                    <div>
+                        <h1>当日已完成</h1>
+                        <h1>{{doneList.length}}</h1>
+                    </div>
+                    <ul class="doneList">
+                        <li v-for='item,index in doneList' :key='item+index' @click.stop='dropDoing(index)'>
+                            <span><label :for="item.thing"><input type="checkbox" name="" :id="item.thing" checked disabled>{{item['thing']}}</label></span>
+                            <span>完成时间：{{item['doneTime']}}</span>
+                        </li>
+                    </ul>
+                </div>
+            </article>
+        </main>
+    </div>
+
+    <script>
+        const app = new Vue({
+            el:'#app',
+            data:{
+                storage: localStorage,
+                userInput:'',   //用户输入绑定
+                doingList:[],   //待办列表
+                doneList:[],    //完成列表
+                userCheck:false,    //待办列表复选框全选状态
+            },
+            methods:{
+
+                //提交待办事项到目标列表
+                todoSub:function(){
+                    let val = this.userInput;
+                    if(val){
+                        this.doingList.push({thing:val,isDone:false,isCheck:false});
+                        this.userInput = '';
+                    }
+                    this.saveData();
+                },
+
+                //标记完成的待办事项到完成列表
+                selectDone:function(index){
+                    this.doingList[index].isDone = true;
+                    this.doingList[index].doneTime = this.getDateString();
+                    this.doneList = [...this.doneList,...(this.doingList.splice(index,1))];
+                    this.saveData();
+                },
+
+                //将完成列表的事项返回到待办列表
+                dropDoing:function(index){
+                    if(confirm('Redo once more?')){
+                        this.doingList.push(this.doneList.splice(index,1)[0]);
+                    }
+                    this.saveData();
+                },
+
+                //待办个体选择
+                itemCheck:function(index){
+                    this.doingList[index].isCheck = !this.doingList[index].isCheck;
+                },
+
+                //TODO 待办全选
+                allCheck:function(){
+                   this.userCheck = !this.userCheck;
+                   if(this.userCheck){
+                       this.doingList.forEach(element => {
+                           element.isCheck = true;
+                       });
+                   }else{
+                        this.doingList.forEach(element => {
+                            element.isCheck = false;
+                        });
+                   }
+                },
+
+                //TODO 待办选择删除
+                deleteSelected:function(){
+                    let arr = this.doingList;
+                    this.doingList = arr.filter(e=>!e.isCheck);
+                    this.userCheck = false;
+                    this.saveData();
+                },
+                //本地存储
+                saveData:function(){
+                    localStorage.doingList = JSON.stringify(this.doingList);
+                },
+                //获取当前时间字符串
+                getDateString:function(){
+                    return new Date().toLocaleTimeString();
+                },
+                
+                //获取缓存
+                getLocalCache:function(){
+                    this.doingList = [...this.doingList,...JSON.parse(localStorage.doingList)];
+                }
+            }
+        })
+    </script>
+</body>
+</html>
